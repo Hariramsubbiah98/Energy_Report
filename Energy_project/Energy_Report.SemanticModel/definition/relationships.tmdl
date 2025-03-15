@@ -1,0 +1,8 @@
+relationship c2c51a35-0d41-f503-b419-71988ad95cfc
+	fromColumn: Data.Date
+	toColumn: 'Date Table'.Date
+
+relationship 1c8fa3e1-b50e-f6a7-8b5e-2488cf67c5d4
+	fromColumn: 'Date Table'.Year
+	toColumn: 'Year Table'.Year
+

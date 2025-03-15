@@ -1,0 +1,92 @@
+table Data
+	lineageTag: ce23ce30-e321-433d-8c58-fd7559aa774b
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 10c404bd-c91f-4d68-a1d5-1427d5b3741a
+		summarizeBy: none
+		sourceColumn: Date
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Location
+		dataType: string
+		lineageTag: 566c4604-aa22-48d3-9ce0-e23eadd53fef
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Renewable Energy (kWh)'
+		dataType: int64
+		formatString: 0
+		lineageTag: c17bab4d-58cd-47d7-8808-9f33ed622a08
+		summarizeBy: sum
+		sourceColumn: Renewable Energy (kWh)
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Non-Renewable Energy (kWh)'
+		dataType: double
+		lineageTag: dd4427dc-2104-4465-b4df-ad15f4b63fd2
+		summarizeBy: sum
+		sourceColumn: Non-Renewable Energy (kWh)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Energy Cost (USD)'
+		dataType: double
+		lineageTag: 3fbdb1a7-b143-49a0-af5d-60f17e69271d
+		summarizeBy: sum
+		sourceColumn: Energy Cost (USD)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Carbon Emissions (Tons)'
+		dataType: double
+		lineageTag: d0c2d2c8-2910-4254-bc79-ad9d76700560
+		summarizeBy: sum
+		sourceColumn: Carbon Emissions (Tons)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Renewable Efficiency (%)'
+		dataType: double
+		lineageTag: 82ebfa4b-6c7b-46c3-b973-f3a185c7dcc2
+		summarizeBy: sum
+		sourceColumn: Renewable Efficiency (%)
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Data = m
+		mode: import
+		source =
+				let
+				    Source = Folder.Files("D:\python_scripts\project\Data_analytical\Energy_Analysis\Energy Dataset\Energy Dataset\Data"),
+				    #"Filtered Hidden Files1" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+				    #"Invoke Custom Function1" = Table.AddColumn(#"Filtered Hidden Files1", "Transform File", each #"Transform File"([Content])),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Invoke Custom Function1", {"Name", "Source.Name"}),
+				    #"Removed Other Columns1" = Table.SelectColumns(#"Renamed Columns1", {"Source.Name", "Transform File"}),
+				    #"Expanded Table Column1" = Table.ExpandTableColumn(#"Removed Other Columns1", "Transform File", Table.ColumnNames(#"Transform File"(#"Sample File"))),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Expanded Table Column1",{{"Source.Name", type text}, {"Date", type text}, {"Location", type text}, {"Renewable Energy (kWh)", Int64.Type}, {"Non-Renewable Energy (kWh)", type number}, {"Energy Cost (USD)", type number}, {"Carbon Emissions (Tons)", type number}, {"Renewable Efficiency (%)", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Source.Name"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

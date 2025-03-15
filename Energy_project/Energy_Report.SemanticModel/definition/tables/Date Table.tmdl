@@ -1,0 +1,70 @@
+table 'Date Table'
+	lineageTag: 8674976d-e0aa-4f07-8c82-b000bad756cf
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: General Date
+		lineageTag: b2303e1b-b598-47f8-b841-d3a9bf7a81c4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: a775c4f0-dcc9-4fde-abc8-54b5b8c45ab1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		formatString: 0
+		lineageTag: f1cee58f-29e3-496d-9133-8d338408e111
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Month Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		lineageTag: 20399958-143d-4c42-9202-f927b203ec05
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month]
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Season
+		lineageTag: 76fbd92a-605a-40ba-a82b-1c47d5ecb8b9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Season]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Date Table' = calculated
+		mode: import
+		source =
+				
+				ADDCOLUMNS(
+				    CALENDARAUTO(),
+				    "Year",YEAR([Date]),
+				    "Month Number",MONTH([Date]),
+				    "Month",FORMAT([Date],"mmm"),
+				    "Season",
+				    SWITCH(
+				        TRUE(),
+				        MONTH([Date]) IN {12,1,2},"Winter",
+				        MONTH([Date]) IN {3,4,5},"Spring",
+				        MONTH([Date]) IN {6,7,8},"Summer",
+				        MONTH([Date]) IN {9,10,11},"Autumn"
+				    )
+				)
+
+	annotation PBI_Id = 4d31360f800a4f029ec4f109ea306f68
+

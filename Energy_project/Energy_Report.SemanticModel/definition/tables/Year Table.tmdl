@@ -1,0 +1,93 @@
+table 'Year Table'
+	isHidden
+	lineageTag: 7078572d-2705-4314-b21b-cc5e6a1e5b74
+
+	measure 'Yoy Change' = ```
+			
+			IF( 
+			    SELECTEDVALUE('Year Table'[Year])="Changes",
+			    VAR _value2023 = 
+			    CALCULATE(
+			        [Renewable Energy (kwh)],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        FORMAT('Date Table'[Date],"YYYY") = "2023"
+			    )
+			    VAR _value2024 = 
+			    CALCULATE(
+			        [Renewable Energy (kwh)],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        FORMAT('Date Table'[Date],"YYYY") = "2024"
+			    )
+			    RETURN
+			    MAX(_value2023,_value2024),
+			    [Renewable Energy (kwh)]
+			)
+			```
+		isHidden
+		lineageTag: 3ba97656-c606-44c3-9d0a-7a6bb3cd21a6
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Yoy Change' = ```
+			
+			IF( 
+			    SELECTEDVALUE('Year Table'[Year]) = "Changes",
+			    VAR _value2023 = 
+			    CALCULATE(
+			        [Groups],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        YEAR('Date Table'[Date]) = 2023
+			    )
+			    VAR _value2024 = 
+			    CALCULATE(
+			        [Groups],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        YEAR('Date Table'[Date]) = 2024
+			    )
+			
+			    VAR _result =
+			    DIVIDE(
+			        (_value2024 - _value2023),
+			        _value2023
+			    )
+			
+			    RETURN
+			    IF(
+			        NOT ISBLANK(_result),
+			        IF(_result < 0, FORMAT(_result, "0.00%"), "+" & FORMAT(_result, "0.00%")),
+			        BLANK()
+			    )
+			)
+			
+			```
+		isHidden
+		lineageTag: 5bfc452b-1083-4296-9d72-136a55e03a66
+
+		changedProperty = IsHidden
+
+	column Year
+		dataType: string
+		isHidden
+		lineageTag: 391a660b-0421-4dd1-805e-02e0b551c7a8
+		summarizeBy: none
+		sourceColumn: Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Year Table' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMjIwMlaK1QEzTMAM54zEvPTUYqXYWAA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Year = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Year", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

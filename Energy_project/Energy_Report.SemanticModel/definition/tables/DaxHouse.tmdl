@@ -1,0 +1,294 @@
+table DaxHouse
+	isHidden
+	lineageTag: 622605fd-0449-42bd-aef7-310c5f3e21fb
+
+	measure 'Renewable Energy (kwh)' = SUM(Data[Renewable Energy (kWh)])
+		formatString: 0
+		isHidden
+		lineageTag: 4fb8d8db-000b-48b6-8047-cee3061c57bd
+
+	measure 'Non Renewable Energy (kwh)' = SUM(Data[Non-Renewable Energy (kWh)])
+		formatString: 0
+		isHidden
+		lineageTag: b715f6a8-a010-42a7-b419-9063cf2c5dfb
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Total Energy Consumption (kwh)' = [Renewable Energy (kwh)]+[Non Renewable Energy (kwh)]
+		isHidden
+		lineageTag: 3e47fd8d-60ae-4b8c-87d5-fffcd619bc40
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Emisson Factor (kg CO2/kwh)' =
+			
+			DIVIDE(
+			    SUM(Data[Carbon Emissions (Tons)])*1000,[Total Energy Consumption (kwh)]
+			)
+		formatString: 0
+		isHidden
+		lineageTag: 36e6c3d1-97be-4e4a-ac72-1d57fbbcd2b2
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Energy cost (USD)' = SUM(Data[Energy Cost (USD)])
+		isHidden
+		lineageTag: 94596ac1-d549-4b3e-887b-0b9ec20972dd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Energy Cost per kwh' =
+			
+			DIVIDE(
+			    [Energy cost (USD)],
+			    [Total Energy Consumption (kwh)]
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		isHidden
+		lineageTag: 4e1de089-d6f3-471d-8d2b-73d24610683d
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'CF yoy Change' = ```
+			
+			IF( 
+			    SELECTEDVALUE('Year Table'[Year])="Changes",
+			    VAR _value2023 = 
+			    CALCULATE(
+			        [Renewable Energy (kwh)],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        FORMAT('Date Table'[Date],"YYYY") = "2023"
+			    )
+			    VAR _value2024 = 
+			    CALCULATE(
+			        [Renewable Energy (kwh)],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        FORMAT('Date Table'[Date],"YYYY") = "2024"
+			    )
+			
+			    VAR _result =
+			    DIVIDE(
+			        (_value2024-_value2023),
+			        _value2023
+			    )
+			    RETURN
+			    IF(_result>0,1,0)
+			
+			)
+			
+			```
+		formatString: 0
+		isHidden
+		lineageTag: f0d4f75b-8427-43d0-83c2-b0cab3263f2c
+
+	measure Value2023 = ```
+			
+			IF( 
+			    SELECTEDVALUE('Year Table'[Year])="Changes",
+			    CALCULATE(
+			        [Groups],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        FORMAT('Date Table'[Date],"YYYY") = "2023"
+			    ),
+			    BLANK()
+			)
+			```
+		formatString: 0
+		isHidden
+		lineageTag: 8618587a-df52-46d8-b768-4c11fcf1c724
+
+	measure Value2024 = ```
+			
+			IF( 
+			    SELECTEDVALUE('Year Table'[Year])="Changes",
+			    CALCULATE(
+			        [Groups],
+			        REMOVEFILTERS('Year Table'[Year]),
+			        FORMAT('Date Table'[Date],"YYYY") = "2024"
+			    ),
+			    BLANK()
+			)
+			```
+		formatString: 0
+		isHidden
+		lineageTag: f4165b32-630b-4d7f-b161-623786ca956e
+
+	measure Groups = ```
+			
+			VAR _selected =
+			    SELECTEDVALUE('Switch'[Switch Order])
+			
+			RETURN
+			    SWITCH(
+			        _selected,
+			        0, [Renewable Energy (kwh)],
+			        1, [Non Renewable Energy (kwh)],
+			        2, [Total Energy Consumption (kwh)],
+			        3, [Energy Cost per kwh],
+			        4, [Emisson Factor (kg CO2/kwh)],
+			        BLANK()  
+			    )
+			
+			
+			```
+		formatString: 0
+		isHidden
+		lineageTag: 02616169-885f-4725-ab49-3f27cef8526c
+
+	measure 'CF highlight' = ```
+			
+			VAR _selected =
+			    SELECTEDVALUE('Switch'[Switch Order])
+			
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			       _selected = 0,0,
+			       _selected = 1,1,
+			       _selected = 2,2,
+			       _selected = 3,3,
+			       _selected = 4,4
+			    )
+			
+			
+			```
+		formatString: 0
+		isHidden
+		lineageTag: 9b2be87d-8fa9-433c-99f3-93eca5b11037
+
+	measure 'Group Title' = ```
+			
+			VAR _selected =
+			    SELECTEDVALUE('Switch'[Switch Order])
+			
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			       _selected = 0,"Total Renewable Energy by Top 3 Location",
+			       _selected = 1,"Total Non-Renewable Energy by Top 3 Location",
+			       _selected = 2,"Total Energy Consumption by Top 3 Location",
+			       _selected = 3,"Energy Cost per Kwh",
+			       _selected = 4,"Emisson Factor (kg CO2/kwh)"
+			    )
+			
+			
+			```
+		isHidden
+		lineageTag: 55fccc03-35cd-495b-9bfb-b16ddc1f6cda
+
+	measure '% Renewable Energy Share' =
+			
+			VAR _renewable = [Renewable Energy (kwh)]
+			VAR _energyConsumed = [Total Energy Consumption (kwh)]
+			RETURN
+			DIVIDE(
+			    _renewable,
+			    _energyConsumed
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		lineageTag: fc6eec60-39ec-4682-953a-066907da74e5
+
+	measure '% Non Renewable Energy Share' =
+			
+			VAR _Nonrenewable = [Non Renewable Energy (kwh)]
+			VAR _energyConsumed = [Total Energy Consumption (kwh)]
+			RETURN
+			DIVIDE(
+			    _Nonrenewable,
+			    _energyConsumed
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		lineageTag: 82e27069-f736-44e4-a03c-fe310bda2f61
+
+	measure 'Total Energy cost' =
+			
+			VAR energy = [Energy cost (USD)]
+			VAR total = [Total Energy Consumption (kwh)]
+			RETURN
+			DIVIDE(
+			    energy,
+			    total
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		lineageTag: 2011908b-030c-4df4-9590-4401f7be1214
+
+	measure 'Total Renewable Energy Cost' = ```
+			
+			VAR _totalenergycost = [Energy cost (USD)]
+			VAR _renewableenergyproportion = 
+			DIVIDE(
+			    [Renewable Energy (kwh)],
+			    [Total Energy Consumption (kwh)]
+			)
+			VAR estimatedrenewablecost = _totalenergycost*_renewableenergyproportion
+			RETURN
+			estimatedrenewablecost
+			```
+		isHidden
+		lineageTag: 6966b4e3-937b-4081-90ef-0efeefbb0942
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Energy Cost Summary' = ```
+			
+			"Renewable energy costs $" & FORMAT([Total Renewable Energy Cost], "#,##0.00") & " per kWh, while non-renewable energy costs $" & FORMAT([Total Non Renewable Energy Cost], "#,##0.00") & "." &
+			IF(
+			    [Total Renewable Energy Cost] > [Total Non Renewable Energy Cost],
+			    " It is higher by " & FORMAT(
+			        DIVIDE(
+			            [Total Renewable Energy Cost] - [Total Non Renewable Energy Cost],
+			            [Total Non Renewable Energy Cost], 
+			            0
+			        ) * 100, "0.0") & "%, which increases costs.",
+			    " It is lower by " & FORMAT(
+			        DIVIDE(
+			            [Total Non Renewable Energy Cost] - [Total Renewable Energy Cost],
+			            [Total Non Renewable Energy Cost], 
+			            0
+			        ) * 100, "0.0") & "%, which reduces costs."
+			)
+			
+			```
+		isHidden
+		lineageTag: 3e190f47-c246-48b8-95d2-c5a87adaf40e
+
+	measure 'Total Non Renewable Energy Cost' = ```
+			
+			VAR _totalenergycost = [Energy cost (USD)]
+			VAR _renewableenergyproportion = 
+			DIVIDE(
+			    [Non Renewable Energy (kwh)],
+			    [Total Energy Consumption (kwh)]
+			)
+			VAR estimatedrenewablecost = _totalenergycost*_renewableenergyproportion
+			RETURN
+			estimatedrenewablecost
+			```
+		isHidden
+		lineageTag: 0e1b3794-882d-41ee-bde6-2e2c8a6b006f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Value
+		isHidden
+		formatString: 0
+		lineageTag: df0cf30d-d805-4f9b-b330-821b045d05e9
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DaxHouse = calculated
+		mode: import
+		source = ```
+				{1}
+				
+				
+				```
+
+	annotation PBI_Id = a92454762ad34aa79325d1ca754eba3b
+

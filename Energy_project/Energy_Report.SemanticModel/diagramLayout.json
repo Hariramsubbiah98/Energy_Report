@@ -1,0 +1,86 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 242,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 411,
+            "y": 127
+          },
+          "nodeIndex": "Data",
+          "nodeLineageTag": "ce23ce30-e321-433d-8c58-fd7559aa774b",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 560,
+            "y": 366
+          },
+          "nodeIndex": "DaxHouse",
+          "nodeLineageTag": "622605fd-0449-42bd-aef7-310c5f3e21fb",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 570,
+            "y": 0
+          },
+          "nodeIndex": "Year Table",
+          "nodeLineageTag": "7078572d-2705-4314-b21b-cc5e6a1e5b74",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 852,
+            "y": 36
+          },
+          "nodeIndex": "Date Table",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 829,
+            "y": 236
+          },
+          "nodeIndex": "Switch",
+          "nodeLineageTag": "7f918a66-0f16-483d-aaa6-d9108dc31369",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

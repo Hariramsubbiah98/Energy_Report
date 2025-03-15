@@ -1,0 +1,53 @@
+table Switch
+	isHidden
+	lineageTag: 7f918a66-0f16-483d-aaa6-d9108dc31369
+
+	column Switch
+		isHidden
+		lineageTag: e91dd551-5b75-4f17-a515-a3894ebf96d1
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Switch Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Switch Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Switch Fields'
+		isHidden
+		lineageTag: b8464487-b941-40bc-8f16-ad793f409a1e
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Switch Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Switch Order'
+		isHidden
+		formatString: 0
+		lineageTag: fab4f8ec-4471-4564-bb48-7404578dc507
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Switch = calculated
+		mode: import
+		source =
+				{
+				    ("Renewable Energy (kwh)", NAMEOF('DaxHouse'[Renewable Energy (kwh)]), 1),
+				    ("Non Renewable Energy (kwh)", NAMEOF('DaxHouse'[Non Renewable Energy (kwh)]), 2),
+				    (" Energy Consumption (kwh)", NAMEOF('DaxHouse'[Total Energy Consumption (kwh)]), 0),
+				    ("Energy Cost per kwh", NAMEOF('DaxHouse'[Energy Cost per kwh]), 4),
+				    ("Emisson Factor (kg CO2/kwh)", NAMEOF('DaxHouse'[Emisson Factor (kg CO2/kwh)]), 3)
+				}
+
+	annotation PBI_Id = fd9152da82a0451a8fb59d4c013e0df4
+
